@@ -4,10 +4,13 @@
  */
 package Main;
 
-/**
- *
- * @author admin
- */
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import java.sql.ResultSet;
+import javax.swing.JComboBox;
+import javax.swing.table.DefaultTableModel;
 public class Resto extends javax.swing.JFrame {
 
     /**
@@ -15,7 +18,44 @@ public class Resto extends javax.swing.JFrame {
      */
     public Resto() {
         initComponents();
+        loadrestoToTable();
     }
+private void loadrestoToTable() {
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    model.setRowCount(0); // Clear existing rows
+
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
+
+    try {
+        // Establish connection to the database
+        connection = DatabaseConnection.getConnection();
+
+        // SQL query to fetch restaurant data
+        String sql = "SELECT Id, Menu, Price FROM Restaurants";
+        preparedStatement = connection.prepareStatement(sql);
+
+        // Execute the query
+        resultSet = preparedStatement.executeQuery();
+
+        // Loop through resultSet and populate the table model
+        while (resultSet.next()) {
+            int id = resultSet.getInt("Id");
+            String menu = resultSet.getString("Menu");
+            double price = resultSet.getDouble("Price");
+
+            model.addRow(new Object[]{id, menu, price});
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } finally {
+        // Close resources
+        if (resultSet != null) try { resultSet.close(); } catch (SQLException e) { e.printStackTrace(); }
+        if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
+        if (connection != null) DatabaseConnection.closeConnection(connection);
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -32,6 +72,9 @@ public class Resto extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButton7 = new javax.swing.JButton();
+        Add = new javax.swing.JButton();
+        edit = new javax.swing.JButton();
+        delete = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -62,13 +105,13 @@ public class Resto extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "ID", "Menu", "Prices"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -83,27 +126,67 @@ public class Resto extends javax.swing.JFrame {
             }
         });
 
+        Add.setBackground(new java.awt.Color(204, 255, 204));
+        Add.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        Add.setText("ADD");
+        Add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AddActionPerformed(evt);
+            }
+        });
+
+        edit.setBackground(new java.awt.Color(204, 204, 255));
+        edit.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        edit.setText("UPDATE");
+        edit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editActionPerformed(evt);
+            }
+        });
+
+        delete.setBackground(new java.awt.Color(255, 204, 204));
+        delete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        delete.setText("DELETE");
+        delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(Add, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(6, 6, 6))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                .addGap(24, 24, 24)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(Add, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(57, 57, 57)
+                        .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(67, 67, 67)
+                        .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16))
         );
@@ -120,6 +203,7 @@ public class Resto extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
@@ -127,6 +211,148 @@ public class Resto extends javax.swing.JFrame {
         main.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
+    int selectedRow = jTable1.getSelectedRow();
+
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Please select a row to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    int id = (int) jTable1.getValueAt(selectedRow, 0); // Column 0: Id
+    String menu = (String) jTable1.getValueAt(selectedRow, 1); // Column 1: Menu
+
+    int confirm = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to delete Menu: " + menu + "?",
+        "Delete Confirmation",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE
+    );
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+
+        try {
+            connection = DatabaseConnection.getConnection();
+            String sql = "DELETE FROM Restaurants WHERE Id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+
+            int rowsDeleted = preparedStatement.executeUpdate();
+            if (rowsDeleted > 0) {
+                ((DefaultTableModel) jTable1.getModel()).removeRow(selectedRow);
+                JOptionPane.showMessageDialog(this, "Menu deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
+            if (connection != null) DatabaseConnection.closeConnection(connection);
+        }
+    }
+    }//GEN-LAST:event_deleteActionPerformed
+
+    private void editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editActionPerformed
+ int selectedRow = jTable1.getSelectedRow();
+
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    int id = (int) jTable1.getValueAt(selectedRow, 0); // Column 0: Id
+    String currentMenu = (String) jTable1.getValueAt(selectedRow, 1); // Column 1: Menu
+    double currentPrice = (double) jTable1.getValueAt(selectedRow, 2); // Column 2: Price
+
+    // Get updated menu name and price
+    String updatedMenu = JOptionPane.showInputDialog(this, "Edit Menu Name:", currentMenu);
+    if (updatedMenu == null || updatedMenu.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Menu name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    String priceInput = JOptionPane.showInputDialog(this, "Edit Price:", currentPrice);
+    double updatedPrice;
+    try {
+        updatedPrice = Double.parseDouble(priceInput);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid price format. Please enter a valid number.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+
+    try {
+        connection = DatabaseConnection.getConnection();
+        String sql = "UPDATE Restaurants SET Menu = ?, Price = ? WHERE Id = ?";
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, updatedMenu);
+        preparedStatement.setDouble(2, updatedPrice);
+        preparedStatement.setInt(3, id);
+
+        int rowsUpdated = preparedStatement.executeUpdate();
+        if (rowsUpdated > 0) {
+            jTable1.setValueAt(updatedMenu, selectedRow, 1); // Update Menu column
+            jTable1.setValueAt(updatedPrice, selectedRow, 2); // Update Price column
+            JOptionPane.showMessageDialog(this, "Menu updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
+        if (connection != null) DatabaseConnection.closeConnection(connection);
+    }
+    }//GEN-LAST:event_editActionPerformed
+
+    private void AddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddActionPerformed
+      // Prompt user for menu name and price
+    String menuName = JOptionPane.showInputDialog(this, "Enter Menu Name:", "Add Menu", JOptionPane.PLAIN_MESSAGE);
+
+    if (menuName == null || menuName.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Menu name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    String priceInput = JOptionPane.showInputDialog(this, "Enter Price:", "Add Menu", JOptionPane.PLAIN_MESSAGE);
+    if (priceInput == null || priceInput.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Price cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    double price;
+    try {
+        price = Double.parseDouble(priceInput);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid price format. Please enter a valid number.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+
+    try {
+        connection = DatabaseConnection.getConnection();
+        String sql = "INSERT INTO Restaurants (Menu, Price) VALUES (?, ?)";
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, menuName);
+        preparedStatement.setDouble(2, price);
+
+        int rowsInserted = preparedStatement.executeUpdate();
+        if (rowsInserted > 0) {
+            JOptionPane.showMessageDialog(this, "Menu added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadrestoToTable(); // Refresh table
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
+        if (connection != null) DatabaseConnection.closeConnection(connection);
+    }
+    }//GEN-LAST:event_AddActionPerformed
 
     /**
      * @param args the command line arguments
@@ -167,6 +393,9 @@ public class Resto extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton Add;
+    private javax.swing.JButton delete;
+    private javax.swing.JButton edit;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;

@@ -4,10 +4,25 @@
  */
 package Main;
 
-/**
- *
- * @author admin
- */
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionListener;
+import java.io.PrintWriter;
+import javax.swing.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+import java.sql.ResultSet;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JComboBox;
+import javax.swing.table.DefaultTableModel;
 public class Menu extends javax.swing.JFrame {
 
     /**
@@ -16,6 +31,56 @@ public class Menu extends javax.swing.JFrame {
     public Menu() {
         initComponents();
     }
+private void loadPricesToDropdown(String category, JComboBox<String> dropdown) {
+    dropdown.removeAllItems();
+    dropdown.addItem("Please choose");
+    dropdown.addItem("NONE");
+    try {
+        Connection connection = DatabaseConnection.getConnection();
+        String sql = "SELECT Name FROM Prices WHERE Category = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, category);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            dropdown.addItem(resultSet.getString("Name"));
+        }
+
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error loading " + category + " data:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+
+private double getPriceFromDatabase(String name, String category) {
+    if ("NONE".equalsIgnoreCase(name) || "Please choose".equalsIgnoreCase(name)) {
+        return 0.0; // No cost for NONE or unselected options
+    }
+
+    double price = 0.0;
+    try {
+        Connection connection = DatabaseConnection.getConnection();
+        String sql = "SELECT Price FROM Prices WHERE Name = ? AND Category = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, name);
+        preparedStatement.setString(2, category);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            price = resultSet.getDouble("Price");
+        }
+
+        resultSet.close();
+        preparedStatement.close();
+        connection.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error fetching price:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+    }
+    return price;
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -27,65 +92,65 @@ public class Menu extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        room = new javax.swing.JButton();
+        res = new javax.swing.JButton();
+        Bookings = new javax.swing.JButton();
+        pools = new javax.swing.JButton();
+        list = new javax.swing.JButton();
+        acts = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(108, 136, 129));
+        jPanel1.setBackground(new java.awt.Color(102, 255, 204));
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/door-lock.png"))); // NOI18N
-        jButton1.setText("ROOMS");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        room.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/door-lock.png"))); // NOI18N
+        room.setText("ROOMS");
+        room.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                roomActionPerformed(evt);
             }
         });
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/restaurant-building.png"))); // NOI18N
-        jButton2.setText("RESTAURANTS");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        res.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/restaurant-building.png"))); // NOI18N
+        res.setText("RESTAURANTS");
+        res.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                resActionPerformed(evt);
             }
         });
 
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/payment-method.png"))); // NOI18N
-        jButton3.setText("BOOKINGS");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        Bookings.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/payment-method.png"))); // NOI18N
+        Bookings.setText("BILLING");
+        Bookings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                BookingsActionPerformed(evt);
             }
         });
 
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/swimming-pool.png"))); // NOI18N
-        jButton4.setText("POOL'S");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        pools.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/swimming-pool.png"))); // NOI18N
+        pools.setText("POOL'S");
+        pools.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                poolsActionPerformed(evt);
             }
         });
 
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/invoice.png"))); // NOI18N
-        jButton5.setText("LIST OF PRICE");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        list.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/invoice.png"))); // NOI18N
+        list.setText("LIST OF PRICE");
+        list.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                listActionPerformed(evt);
             }
         });
 
-        jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/team-building.png"))); // NOI18N
-        jButton6.setText("ACTIVITIES");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        acts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/team-building.png"))); // NOI18N
+        acts.setText("ACTIVITIES");
+        acts.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                actsActionPerformed(evt);
             }
         });
 
@@ -99,9 +164,9 @@ public class Menu extends javax.swing.JFrame {
             }
         });
 
-        jPanel2.setBackground(new java.awt.Color(126, 87, 126));
+        jPanel2.setBackground(new java.awt.Color(0, 153, 153));
 
-        jLabel1.setFont(new java.awt.Font("Tempus Sans ITC", 1, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(204, 255, 204));
         jLabel1.setText("RESORT FRONT DESK SYSTEM MENU'S");
 
@@ -110,7 +175,7 @@ public class Menu extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(89, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 659, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(81, 81, 81))
         );
@@ -129,16 +194,16 @@ public class Menu extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(47, 47, 47)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(96, 96, 96)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(room, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(res, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pools, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(list, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(113, 113, 113)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(acts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(Bookings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(84, 84, 84))
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -152,14 +217,14 @@ public class Menu extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(68, 68, 68)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(room, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pools, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(acts, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(79, 79, 79)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(res, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(list, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(Bookings, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
                 .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
@@ -180,29 +245,321 @@ public class Menu extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void roomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roomActionPerformed
+        Room room = new Room();
+        room.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_roomActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void resActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resActionPerformed
+        Resto resto = new Resto();
+        resto.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_resActionPerformed
+// Receipt Frame
+private void showReceiptFrame(String fullName, double total, String checkInDate, String checkOutDate) {
+    JFrame receiptFrame = new JFrame("Receipt");
+    receiptFrame.setLayout(new GridLayout(7, 2));
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    JTextField nameField = new JTextField(fullName);
+    JTextField contactField = new JTextField();
+    JTextField birthdateField = new JTextField();
+    JComboBox<String> paymentDropdown = new JComboBox<>(new String[]{"Cash", "Credit Card", "GCash"});
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+    receiptFrame.add(new JLabel("Name:"));
+    receiptFrame.add(nameField);
+    receiptFrame.add(new JLabel("Contact:"));
+    receiptFrame.add(contactField);
+    receiptFrame.add(new JLabel("Birthdate:"));
+    receiptFrame.add(birthdateField);
+    receiptFrame.add(new JLabel("Payment Method:"));
+    receiptFrame.add(paymentDropdown);
+    
+    receiptFrame.add(new JLabel("Check-in Date:"));
+    receiptFrame.add(new JTextField(checkInDate)); // Display check-in date
+    receiptFrame.add(new JLabel("Check-out Date:"));
+    receiptFrame.add(new JTextField(checkOutDate)); // Display check-out date
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+    JButton saveButton = new JButton("Save Receipt");
+    receiptFrame.add(saveButton);
+
+    saveButton.addActionListener(e -> {
+        try {
+            String contact = contactField.getText();
+            String birthdate = birthdateField.getText();
+            String paymentMethod = (String) paymentDropdown.getSelectedItem();
+
+            if (contact.isEmpty() || birthdate.isEmpty()) {
+                JOptionPane.showMessageDialog(receiptFrame, "Please fill all fields!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String receiptContent = "Name: " + fullName +
+                    "\nContact: " + contact +
+                    "\nBirthdate: " + birthdate +
+                    "\nCheck-in Date: " + checkInDate +  // Add Check-in date to the receipt
+                    "\nCheck-out Date: " + checkOutDate +  // Add Check-out date to the receipt
+                    "\nPayment Method: " + paymentMethod +
+                    "\nTotal: ₱" + String.format("%.2f", total);
+
+            try (PrintWriter writer = new PrintWriter("receipt.txt")) {
+                writer.println(receiptContent);
+            }
+
+            JOptionPane.showMessageDialog(receiptFrame, "Receipt saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            receiptFrame.dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(receiptFrame, "Error saving receipt:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+
+    receiptFrame.setSize(500, 300);
+    receiptFrame.setVisible(true);
+}
+    private void BookingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BookingsActionPerformed
+    JTextField fullNameField = new JTextField();
+    JTextField numPeopleField = new JTextField();
+    JComboBox<String> roomDropdown = new JComboBox<>();
+    JComboBox<String> poolDropdown = new JComboBox<>();
+    JComboBox<String> activitiesDropdown = new JComboBox<>();
+    JCheckBox parkingCheckbox = new JCheckBox("Parking (₱100)");
+    JCheckBox cottageCheckbox = new JCheckBox("Cottage (₱350)");
+    JLabel totalLabel = new JLabel("Total: ₱0.00");
+    
+    JTextField checkInField = new JTextField();
+    JTextField checkOutField = new JTextField();
+
+    // Load data from Prices table
+    loadPricesToDropdown("Room", roomDropdown);
+    loadPricesToDropdown("Pool", poolDropdown);
+    loadPricesToDropdown("Activities", activitiesDropdown);
+
+    // Panel for user input
+    JPanel panel = new JPanel(new GridLayout(10, 3));
+    panel.add(new JLabel("Full Name:"));
+    panel.add(fullNameField);
+    panel.add(new JLabel("Number of People:"));
+    panel.add(numPeopleField);
+    panel.add(new JLabel("Check-in Date (YYYY-MM-DD):"));
+    panel.add(checkInField);
+    panel.add(new JLabel("Check-out Date (YYYY-MM-DD):"));
+    panel.add(checkOutField);
+    panel.add(new JLabel("Select Room:"));
+    panel.add(roomDropdown);
+    panel.add(new JLabel("Select Pool:"));
+    panel.add(poolDropdown);
+    panel.add(new JLabel("Select Activity:"));
+    panel.add(activitiesDropdown);
+    panel.add(parkingCheckbox);
+    panel.add(cottageCheckbox);
+    panel.add(totalLabel);
+
+    // Listener to calculate total dynamically
+    ActionListener updateTotalListener = e -> {
+        double total = 0.0;
+
+        String selectedRoom = (String) roomDropdown.getSelectedItem();
+        String selectedPool = (String) poolDropdown.getSelectedItem();
+        String selectedActivity = (String) activitiesDropdown.getSelectedItem();
+
+        if (selectedRoom != null) total += getPriceFromDatabase(selectedRoom, "Room");
+        if (selectedPool != null) total += getPriceFromDatabase(selectedPool, "Pool");
+        if (selectedActivity != null) total += getPriceFromDatabase(selectedActivity, "Activities");
+
+        if (parkingCheckbox.isSelected()) total += 100;
+        if (cottageCheckbox.isSelected()) total += 350;
+
+        totalLabel.setText("Total: ₱" + String.format("%.2f", total));
+    };
+
+    roomDropdown.addActionListener(updateTotalListener);
+    poolDropdown.addActionListener(updateTotalListener);
+    activitiesDropdown.addActionListener(updateTotalListener);
+    parkingCheckbox.addActionListener(updateTotalListener);
+    cottageCheckbox.addActionListener(updateTotalListener);
+
+    // Show dialog
+    int result = JOptionPane.showConfirmDialog(this, panel, "Book a Service", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+    if (result == JOptionPane.OK_OPTION) {
+        String fullName = fullNameField.getText();
+        String numPeopleText = numPeopleField.getText();
+        String checkInDate = checkInField.getText();
+        String checkOutDate = checkOutField.getText();
+
+
+        if (fullName.isEmpty() || numPeopleText.isEmpty() || checkInDate.isEmpty() || checkOutDate.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all required fields!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date checkIn = null;
+        try {
+            checkIn = dateFormat.parse(checkInDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Date checkOut = null;
+        try {
+            checkOut = dateFormat.parse(checkOutDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        long differenceInMillis = checkOut.getTime() - checkIn.getTime();
+        long numberOfNights = TimeUnit.DAYS.convert(differenceInMillis, TimeUnit.MILLISECONDS);
+
+        // Get the room price
+        double roomPrice = getPriceFromDatabase((String) roomDropdown.getSelectedItem(), "Room");
+        double totalRoomCost = roomPrice * numberOfNights;
+
+        // Calculate total including additional charges
+        double total = totalRoomCost;
+        if (parkingCheckbox.isSelected()) total += 100;
+        if (cottageCheckbox.isSelected()) total += 350;
+
+        // Display the total in the label
+        totalLabel.setText("Total: ₱" + String.format("%.2f", total));
+        JOptionPane.showMessageDialog(this, "Booking confirmed! Total amount: ₱" + String.format("%.2f", total), "Booking Success", JOptionPane.INFORMATION_MESSAGE);
+        
+        
+        JPanel confirmationPanel = new JPanel(new GridLayout(10, 2));
+        confirmationPanel.setBackground(Color.WHITE);
+
+        Font font = new Font("Segoe UI", Font.BOLD, 14);
+
+        JLabel fullNameLabel = new JLabel("Full Name:");
+        fullNameLabel.setFont(font);
+        confirmationPanel.add(fullNameLabel);
+        JLabel fullNameValue = new JLabel(fullName);
+        fullNameValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(fullNameValue);
+
+        JLabel numPeopleLabel = new JLabel("Number of People:");
+        numPeopleLabel.setFont(font);
+        confirmationPanel.add(numPeopleLabel);
+        JLabel numPeopleValue = new JLabel(numPeopleText);
+        numPeopleValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+confirmationPanel.add(numPeopleValue);
+
+JLabel checkInLabel = new JLabel("Check-in Date:");
+checkInLabel.setFont(font);
+confirmationPanel.add(checkInLabel);
+JLabel checkInValue = new JLabel(checkInDate);
+checkInValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+confirmationPanel.add(checkInValue);
+
+JLabel checkOutLabel = new JLabel("Check-out Date:");
+checkOutLabel.setFont(font);
+confirmationPanel.add(checkOutLabel);
+JLabel checkOutValue = new JLabel(checkOutDate);
+checkOutValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+confirmationPanel.add(checkOutValue);
+
+JLabel roomLabel = new JLabel("Room:");
+roomLabel.setFont(font);
+confirmationPanel.add(roomLabel);
+JLabel roomValue = new JLabel((String) roomDropdown.getSelectedItem());
+roomValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+confirmationPanel.add(roomValue);
+
+JLabel poolLabel = new JLabel("Pool:");
+poolLabel.setFont(font);
+confirmationPanel.add(poolLabel);
+JLabel poolValue = new JLabel((String) poolDropdown.getSelectedItem());
+poolValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+confirmationPanel.add(poolValue);
+
+JLabel activityLabel = new JLabel("Activity:");
+activityLabel.setFont(font);
+confirmationPanel.add(activityLabel);
+JLabel activityValue = new JLabel((String) activitiesDropdown.getSelectedItem());
+activityValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+confirmationPanel.add(activityValue);
+
+JLabel parkingLabel = new JLabel("Parking:");
+parkingLabel.setFont(font);
+confirmationPanel.add(parkingLabel);
+JLabel parkingValue = new JLabel(parkingCheckbox.isSelected() ? "Yes" : "No");
+parkingValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+confirmationPanel.add(parkingValue);
+
+JLabel cottageLabel = new JLabel("Cottage:");
+cottageLabel.setFont(font);
+confirmationPanel.add(cottageLabel);
+JLabel cottageValue = new JLabel(cottageCheckbox.isSelected() ? "Yes" : "No");
+cottageValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+confirmationPanel.add(cottageValue);
+
+JLabel totalLabelDisplay = new JLabel("Total:");
+totalLabelDisplay.setFont(font);
+confirmationPanel.add(totalLabelDisplay);
+JLabel totalValue = new JLabel(totalLabel.getText()); // Use the existing totalLabel text
+totalValue.setFont(new Font("Segoe UI", Font.BOLD, 16));
+confirmationPanel.add(totalValue);
+
+        int confirmResult = JOptionPane.showConfirmDialog(this, confirmationPanel, "Confirm Booking", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+        if (confirmResult == JOptionPane.OK_OPTION){
+        try {
+            int numPeople = Integer.parseInt(numPeopleText);
+            String room = (String) roomDropdown.getSelectedItem();
+            String pool = (String) poolDropdown.getSelectedItem();
+            String activity = (String) activitiesDropdown.getSelectedItem();
+            boolean parking = parkingCheckbox.isSelected();
+            boolean cottage = cottageCheckbox.isSelected();
+
+            // Save to database
+             Connection connection = DatabaseConnection.getConnection();
+                String sql = "INSERT INTO Billing (FullName, NumberOfPeople, Room, Pool, Activity, Parking, Cottage, Total, CheckInDate, CheckOutDate) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, fullName);
+                preparedStatement.setInt(2, numPeople);
+                preparedStatement.setString(3, room);
+                preparedStatement.setString(4, pool);
+                preparedStatement.setString(5, activity);
+                preparedStatement.setBoolean(6, parking);
+                preparedStatement.setBoolean(7, cottage);
+                preparedStatement.setDouble(8, total);
+                preparedStatement.setString(9, checkInDate);
+                preparedStatement.setString(10, checkOutDate);
+
+            int rowsInserted = preparedStatement.executeUpdate();
+            if (rowsInserted > 0) {
+                JOptionPane.showMessageDialog(this, "Booking successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                // Show receipt frame
+                showReceiptFrame(fullName, total, checkInDate, checkOutDate);
+            }
+
+            preparedStatement.close();
+            connection.close();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid number of people or price value!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error saving booking:\n" + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    }//GEN-LAST:event_BookingsActionPerformed
+    }
+    private void poolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_poolsActionPerformed
+        Pool pool = new Pool();
+        pool.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_poolsActionPerformed
+
+    private void listActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listActionPerformed
+        Prices price = new Prices();
+        price.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_listActionPerformed
+
+    private void actsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actsActionPerformed
+        Activities act = new Activities();
+        act.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_actsActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         Main main = new Main();
@@ -246,15 +603,15 @@ public class Menu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    private javax.swing.JButton Bookings;
+    private javax.swing.JButton acts;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JButton list;
+    private javax.swing.JButton pools;
+    private javax.swing.JButton res;
+    private javax.swing.JButton room;
     // End of variables declaration//GEN-END:variables
 }

@@ -11,16 +11,16 @@ import javax.swing.JOptionPane;
 import java.sql.ResultSet;
 import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableModel;
-public class Room extends javax.swing.JFrame {
+public class Pool extends javax.swing.JFrame {
 
     /**
      * Creates new form Admin_page
      */
-    public Room() {
+    public Pool() {
         initComponents();
-        loadRoomsToTable();
+        loadPoolToTable();
     }
-private void loadRoomsToTable() {
+private void loadPoolToTable() {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     model.setRowCount(0); // Clear existing rows
 
@@ -29,46 +29,31 @@ private void loadRoomsToTable() {
     ResultSet resultSet = null;
 
     try {
-        // Establish database connection
+        // Establish connection to the database
         connection = DatabaseConnection.getConnection();
 
-        // Prepare SQL query to fetch data from Rooms table
-        String sql = "SELECT Id, Room, Status FROM Rooms";
+        // SQL query to fetch pool data
+        String sql = "SELECT Id, Pool, Status FROM Pool";
         preparedStatement = connection.prepareStatement(sql);
 
         // Execute the query
         resultSet = preparedStatement.executeQuery();
 
-        // Loop through the result set and add rows to the table model
+        // Loop through resultSet and populate the table model
         while (resultSet.next()) {
             int id = resultSet.getInt("Id");
-            String room = resultSet.getString("Room");
+            String pool = resultSet.getString("Pool");
             String status = resultSet.getString("Status");
 
-            // Add the data as a row in the table model
-            model.addRow(new Object[]{id, room, status});
+            model.addRow(new Object[]{id, pool, status});
         }
     } catch (SQLException e) {
         e.printStackTrace();
     } finally {
         // Close resources
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if (preparedStatement != null) {
-            try {
-                preparedStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if (connection != null) {
-            DatabaseConnection.closeConnection(connection);
-        }
+        if (resultSet != null) try { resultSet.close(); } catch (SQLException e) { e.printStackTrace(); }
+        if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
+        if (connection != null) DatabaseConnection.closeConnection(connection);
     }
 }
 
@@ -126,7 +111,7 @@ private void loadRoomsToTable() {
                 {null, null, null}
             },
             new String [] {
-                "ID", "Room", "Status"
+                "ID", "Pool", "Status"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -228,23 +213,19 @@ private void loadRoomsToTable() {
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteActionPerformed
- // Get the selected row index
-    int selectedRow = jTable1.getSelectedRow();
+ int selectedRow = jTable1.getSelectedRow();
 
     if (selectedRow == -1) {
-        // No row is selected
         JOptionPane.showMessageDialog(this, "Please select a row to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
         return;
     }
 
-    // Get the ID and Room name from the selected row
     int id = (int) jTable1.getValueAt(selectedRow, 0); // Column 0: Id
-    String room = (String) jTable1.getValueAt(selectedRow, 1); // Column 1: Room
+    String pool = (String) jTable1.getValueAt(selectedRow, 1); // Column 1: Pool
 
-    // Confirm deletion
     int confirm = JOptionPane.showConfirmDialog(
         this,
-        "Are you sure you want to delete Room: " + room + "?",
+        "Are you sure you want to delete Pool: " + pool + "?",
         "Delete Confirmation",
         JOptionPane.YES_NO_OPTION,
         JOptionPane.WARNING_MESSAGE
@@ -255,155 +236,111 @@ private void loadRoomsToTable() {
         PreparedStatement preparedStatement = null;
 
         try {
-            // Establish database connection
             connection = DatabaseConnection.getConnection();
-
-            // Prepare SQL delete query
-            String sql = "DELETE FROM Rooms WHERE Id = ?";
+            String sql = "DELETE FROM Pool WHERE Id = ?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, id);
 
-            // Execute the query
             int rowsDeleted = preparedStatement.executeUpdate();
             if (rowsDeleted > 0) {
-                // Remove the row from the table model
-                ((javax.swing.table.DefaultTableModel) jTable1.getModel()).removeRow(selectedRow);
-                JOptionPane.showMessageDialog(this, "Room deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete the room.", "Error", JOptionPane.ERROR_MESSAGE);
+                ((DefaultTableModel) jTable1.getModel()).removeRow(selectedRow);
+                JOptionPane.showMessageDialog(this, "Pool deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                DatabaseConnection.closeConnection(connection);
-            }
+            if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
+            if (connection != null) DatabaseConnection.closeConnection(connection);
         }
     }
     }//GEN-LAST:event_deleteActionPerformed
 
     private void AddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddActionPerformed
- // Show input dialog to get room name
-    String roomName = JOptionPane.showInputDialog(this, "Enter Room Name:", "Add Room", JOptionPane.PLAIN_MESSAGE);
+// Prompt user for pool name
+    String poolName = JOptionPane.showInputDialog(this, "Enter Pool Name:", "Add Pool", JOptionPane.PLAIN_MESSAGE);
 
     // Check if input is valid
-    if (roomName != null && !roomName.trim().isEmpty()) {
-        // Default status for the new room
+    if (poolName != null && !poolName.trim().isEmpty()) {
+        // Default status for the new pool
         String status = "Available";
 
-        // Insert into database
         Connection connection = null;
         PreparedStatement preparedStatement = null;
-        try {
-            // Get database connection
-            connection = DatabaseConnection.getConnection();
 
-            // Prepare SQL insert query
-            String sql = "INSERT INTO Rooms (Room, Status) VALUES (?, ?)";
+        try {
+            connection = DatabaseConnection.getConnection();
+            String sql = "INSERT INTO Pool (Pool, Status) VALUES (?, ?)";
             preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, roomName);
+            preparedStatement.setString(1, poolName);
             preparedStatement.setString(2, status);
 
-            // Execute the query
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(this, "Room added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadRoomsToTable();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to add room.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Pool added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                // Refresh the table to show the new pool
+                loadPoolToTable();
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         } finally {
-            // Close resources
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                DatabaseConnection.closeConnection(connection);
-            }
+            if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
+            if (connection != null) DatabaseConnection.closeConnection(connection);
         }
     } else {
-        JOptionPane.showMessageDialog(this, "Room name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Pool name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
     }
     }//GEN-LAST:event_AddActionPerformed
 
     private void editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editActionPerformed
-  // Get the selected row index
-    int selectedRow = jTable1.getSelectedRow();
+ int selectedRow = jTable1.getSelectedRow();
 
     if (selectedRow == -1) {
-        // No row is selected
         JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
         return;
     }
 
-    // Get the ID, Room, and current Status from the selected row
     int id = (int) jTable1.getValueAt(selectedRow, 0); // Column 0: Id
-    String room = (String) jTable1.getValueAt(selectedRow, 1); // Column 1: Room
+    String pool = (String) jTable1.getValueAt(selectedRow, 1); // Column 1: Pool
     String currentStatus = (String) jTable1.getValueAt(selectedRow, 2); // Column 2: Status
 
-    // Show a dropdown for the status
+    // Show a dropdown to change the status
     String[] statusOptions = {"Available", "Not Available"};
     JComboBox<String> statusDropdown = new JComboBox<>(statusOptions);
     statusDropdown.setSelectedItem(currentStatus);
 
-    // Show the JOptionPane with the dropdown
     int result = JOptionPane.showConfirmDialog(
         this,
         statusDropdown,
-        "Edit Status for Room: " + room,
+        "Edit Status for Pool: " + pool,
         JOptionPane.OK_CANCEL_OPTION,
         JOptionPane.PLAIN_MESSAGE
     );
 
     if (result == JOptionPane.OK_OPTION) {
-        // Get the new status from the dropdown
         String newStatus = (String) statusDropdown.getSelectedItem();
 
-        // Update the database with the new status
         Connection connection = null;
         PreparedStatement preparedStatement = null;
 
         try {
             connection = DatabaseConnection.getConnection();
-            String sql = "UPDATE Rooms SET Status = ? WHERE Id = ?";
+            String sql = "UPDATE Pool SET Status = ? WHERE Id = ?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, newStatus);
             preparedStatement.setInt(2, id);
 
             int rowsUpdated = preparedStatement.executeUpdate();
             if (rowsUpdated > 0) {
-                // Update the table model to reflect the changes
+                // Update table view
                 jTable1.setValueAt(newStatus, selectedRow, 2); // Update Status column
                 JOptionPane.showMessageDialog(this, "Status updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to update status.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                DatabaseConnection.closeConnection(connection);
-            }
+            if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
+            if (connection != null) DatabaseConnection.closeConnection(connection);
         }
     }
     }//GEN-LAST:event_editActionPerformed
@@ -425,21 +362,23 @@ private void loadRoomsToTable() {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Room.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Pool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Room.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Pool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Room.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Pool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Room.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Pool.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Room().setVisible(true);
+                new Pool().setVisible(true);
             }
         });
     }
