@@ -22,7 +22,7 @@ public class Admin_page extends javax.swing.JFrame {
 // Set up the JTable with correct column headers
 private void setupTable() {
     DefaultTableModel model = new DefaultTableModel();
-    model.setColumnIdentifiers(new String[]{"Id", "Full Name", "Number of People", "Room", "Pool", "Activity", "Parking", "Cottage", "Total"});
+    model.setColumnIdentifiers(new String[]{"Id", "Full Name", "Number of People", "Room", "Pool", "Activity", "Parking", "Cottage", "Check-in Date", "Check-out Date", "Total"});
     jTable1.setModel(model);
 }
 
@@ -35,7 +35,6 @@ private void loadBillingToTable() {
         Connection connection = DatabaseConnection.getConnection();
         String sql = "SELECT * FROM Billing";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
@@ -47,18 +46,21 @@ private void loadBillingToTable() {
             String activity = resultSet.getString("Activity");
             boolean parking = resultSet.getBoolean("Parking");
             boolean cottage = resultSet.getBoolean("Cottage");
+            String checkInDate = resultSet.getString("CheckInDate"); 
+            String checkOutDate = resultSet.getString("CheckOutDate"); 
             double total = resultSet.getDouble("Total");
 
-            // Add a row to the table model
             model.addRow(new Object[]{
-                id, 
-                fullName, 
-                numberOfPeople, 
-                room, 
-                pool, 
-                activity, 
-                parking ? "Yes" : "No", 
-                cottage ? "Yes" : "No", 
+                id,
+                fullName,
+                numberOfPeople,
+                room,
+                pool,
+                activity,
+                parking ? "Yes" : "No",
+                cottage ? "Yes" : "No",
+                checkInDate,
+                checkOutDate,
                 total
             });
         }
@@ -70,6 +72,7 @@ private void loadBillingToTable() {
         JOptionPane.showMessageDialog(this, "Error loading billing data:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
     }
 }
+
 
 // Call setupTable() once during initialization to set up the JTable
 // Call loadBillingToTable() whenever you want to refresh the data
@@ -120,13 +123,13 @@ private void loadBillingToTable() {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Full Name", "No. of people", "Rooms", "Acts", "Pool", "Cottage", "Parking Fee", "Total", "Check In Date", "Check Out Date"
+                "ID", "Full Name", "No. of people", "Rooms", "Acts", "Pool", "Cottage", "Parking Fee", "Total"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
