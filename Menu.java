@@ -4,6 +4,11 @@
  */
 package Main;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
@@ -13,6 +18,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableModel;
 public class Menu extends javax.swing.JFrame {
@@ -46,32 +57,7 @@ private void loadPricesToDropdown(String category, JComboBox<String> dropdown) {
     }
 }
 
-private double getPriceFromDatabase(String name, String category) {
-    if ("NONE".equalsIgnoreCase(name) || "Please choose".equalsIgnoreCase(name)) {
-        return 0.0; // No cost for NONE or unselected options
-    }
 
-    double price = 0.0;
-    try {
-        Connection connection = DatabaseConnection.getConnection();
-        String sql = "SELECT Price FROM Prices WHERE Name = ? AND Category = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setString(1, name);
-        preparedStatement.setString(2, category);
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet.next()) {
-            price = resultSet.getDouble("Price");
-        }
-
-        resultSet.close();
-        preparedStatement.close();
-        connection.close();
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error fetching price:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-    }
-    return price;
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -248,27 +234,52 @@ private double getPriceFromDatabase(String name, String category) {
         this.dispose();
     }//GEN-LAST:event_resActionPerformed
 // Receipt Frame
-private void showReceiptFrame(String fullName, double total) {
+private void showReceiptFrame(String fullName, double total, String checkInDate, String checkOutDate) {
     JFrame receiptFrame = new JFrame("Receipt");
-    receiptFrame.setLayout(new GridLayout(5, 2));
+   receiptFrame.setSize(300, 400);  // Smaller window size
+    receiptFrame.setLocationRelativeTo(null);  // Center the frame
+    receiptFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-    JTextField nameField = new JTextField(fullName);
+    
+     receiptFrame.getContentPane().setBackground(new Color(255, 255, 255));
+    
+    // Use a layout manager with padding and spacing
+    receiptFrame.setLayout(new BoxLayout(receiptFrame.getContentPane(), BoxLayout.Y_AXIS));
+    
+    JLabel titleLabel = new JLabel("Booking Receipt");
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+    titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    titleLabel.setForeground(new Color(51, 51, 255)); // Dark Blue Color
+    receiptFrame.add(titleLabel);
+    receiptFrame.add(Box.createVerticalStrut(10));  // Adds some space below the title
+    
+    addField(receiptFrame, "Name:", fullName);
+    addField(receiptFrame, "Check-in Date:", checkInDate);
+    addField(receiptFrame, "Check-out Date:", checkOutDate);
+    addField(receiptFrame, "Total:", "₱" + String.format("%.2f", total));
+
     JTextField contactField = new JTextField();
     JTextField birthdateField = new JTextField();
     JComboBox<String> paymentDropdown = new JComboBox<>(new String[]{"Cash", "Credit Card", "GCash"});
 
-    receiptFrame.add(new JLabel("Name:"));
-    receiptFrame.add(nameField);
-    receiptFrame.add(new JLabel("Contact:"));
-    receiptFrame.add(contactField);
-    receiptFrame.add(new JLabel("Birthdate:"));
-    receiptFrame.add(birthdateField);
-    receiptFrame.add(new JLabel("Payment Method:"));
-    receiptFrame.add(paymentDropdown);
-
+    addField(receiptFrame, "Contact:", contactField);
+    addField(receiptFrame, "Birthdate:", birthdateField);
+    
+    JPanel paymentPanel = new JPanel();
+    paymentPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    paymentPanel.setBackground(Color.WHITE);
+    paymentPanel.add(new JLabel("Payment Method:"));
+    paymentDropdown.setFont(new Font("Arial", Font.PLAIN, 12));
+    paymentPanel.add(paymentDropdown);
+    receiptFrame.add(paymentPanel);
+    
+    addField(receiptFrame, "Total:", "₱" + String.format("%.2f", total));
+    
     JButton saveButton = new JButton("Save Receipt");
-    receiptFrame.add(saveButton);
-
+    saveButton.setFont(new Font("Arial", Font.BOLD, 14));
+    saveButton.setBackground(new Color(51, 102, 255)); // Blue Color for the button
+    saveButton.setForeground(Color.WHITE);
+    saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
     saveButton.addActionListener(e -> {
         try {
             String contact = contactField.getText();
@@ -280,8 +291,13 @@ private void showReceiptFrame(String fullName, double total) {
                 return;
             }
 
-            String receiptContent = "Name: " + fullName + "\nContact: " + contact + "\nBirthdate: " + birthdate +
-                    "\nPayment Method: " + paymentMethod + "\nTotal: ₱" + String.format("%.2f", total);
+            String receiptContent = "Name: " + fullName +
+                    "\nContact: " + contact +
+                    "\nBirthdate: " + birthdate +
+                    "\nCheck-in Date: " + checkInDate +  // Add Check-in date to the receipt
+                    "\nCheck-out Date: " + checkOutDate +  // Add Check-out date to the receipt
+                    "\nPayment Method: " + paymentMethod +
+                    "\nTotal: ₱" + String.format("%.2f", total);
 
             try (PrintWriter writer = new PrintWriter("receipt.txt")) {
                 writer.println(receiptContent);
@@ -294,7 +310,10 @@ private void showReceiptFrame(String fullName, double total) {
         }
     });
 
-    receiptFrame.setSize(400, 300);
+    receiptFrame.add(Box.createVerticalStrut(10));
+    receiptFrame.add(saveButton);
+
+    
     receiptFrame.setVisible(true);
 }
     private void BookingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BookingsActionPerformed
@@ -307,21 +326,24 @@ private void showReceiptFrame(String fullName, double total) {
     JCheckBox cottageCheckbox = new JCheckBox("Cottage (₱350)");
     JLabel totalLabel = new JLabel("Total: ₱0.00");
     
-    // Add Check-in and Check-out Date fields
-    JTextField checkInDateField = new JTextField();  // Check-in date field
-    JTextField checkOutDateField = new JTextField(); // Check-out date field
+    JTextField checkInField = new JTextField();
+    JTextField checkOutField = new JTextField();
 
-    // Load data from Prices table
+    
     loadPricesToDropdown("Room", roomDropdown);
     loadPricesToDropdown("Pool", poolDropdown);
     loadPricesToDropdown("Activities", activitiesDropdown);
 
-    // Panel for user input
-    JPanel panel = new JPanel(new GridLayout(10, 2));
+    
+    JPanel panel = new JPanel(new GridLayout(10, 3));
     panel.add(new JLabel("Full Name:"));
     panel.add(fullNameField);
     panel.add(new JLabel("Number of People:"));
     panel.add(numPeopleField);
+    panel.add(new JLabel("Check-in Date (YYYY-MM-DD):"));
+    panel.add(checkInField);
+    panel.add(new JLabel("Check-out Date (YYYY-MM-DD):"));
+    panel.add(checkOutField);
     panel.add(new JLabel("Select Room:"));
     panel.add(roomDropdown);
     panel.add(new JLabel("Select Pool:"));
@@ -331,16 +353,8 @@ private void showReceiptFrame(String fullName, double total) {
     panel.add(parkingCheckbox);
     panel.add(cottageCheckbox);
     panel.add(totalLabel);
-    
-    // Add Check-in and Check-out fields to the panel
-    panel.add(new JLabel("Check-in Date (YYYY-MM-DD):"));
-    panel.add(checkInDateField);
-    panel.add(new JLabel("Check-out Date (YYYY-MM-DD):"));
-    panel.add(checkOutDateField);
-    
-    panel.add(totalLabel);
 
-    // Listener to calculate total dynamically
+    
     ActionListener updateTotalListener = e -> {
         double total = 0.0;
 
@@ -364,20 +378,149 @@ private void showReceiptFrame(String fullName, double total) {
     parkingCheckbox.addActionListener(updateTotalListener);
     cottageCheckbox.addActionListener(updateTotalListener);
 
-    // Show dialog
+    
     int result = JOptionPane.showConfirmDialog(this, panel, "Book a Service", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
     if (result == JOptionPane.OK_OPTION) {
         String fullName = fullNameField.getText();
         String numPeopleText = numPeopleField.getText();
-        String checkInDate = checkInDateField.getText();
-        String checkOutDate = checkOutDateField.getText();
+        String checkInDate = checkInField.getText();
+        String checkOutDate = checkOutField.getText();
+
 
         if (fullName.isEmpty() || numPeopleText.isEmpty() || checkInDate.isEmpty() || checkOutDate.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all required fields!", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date checkIn = null;
+        Date checkOut = null;
+        try {
+            checkIn = dateFormat.parse(checkInDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+        try {
+            checkOut = dateFormat.parse(checkOutDate);
+        } catch (ParseException ex) {
+            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        long differenceInMillis = checkOut.getTime() - checkIn.getTime();
+        long numberOfNights = TimeUnit.DAYS.convert(differenceInMillis, TimeUnit.MILLISECONDS);
 
+        
+        double roomPrice = getPriceFromDatabase((String) roomDropdown.getSelectedItem(), "Room");
+
+        
+        if (roomPrice <= 0) {
+            JOptionPane.showMessageDialog(this, "Invalid room price!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        
+       double totalRoomCost = roomPrice * numberOfNights;
+
+        
+        double total = totalRoomCost;
+        String selectedPool = (String) poolDropdown.getSelectedItem();
+        String selectedActivity = (String) activitiesDropdown.getSelectedItem();
+
+        if (selectedPool != null) {
+            total += getPriceFromDatabase(selectedPool, "Pool");
+        }
+
+        if (selectedActivity != null) {
+            total += getPriceFromDatabase(selectedActivity, "Activity");
+        }
+        if (parkingCheckbox.isSelected()) total += 100;
+        if (cottageCheckbox.isSelected()) total += 350;
+
+        
+        totalLabel.setText("Total: ₱" + String.format("%.2f", total));
+
+        
+        JOptionPane.showMessageDialog(this, "Booking confirmed! Total amount: ₱" + String.format("%.2f", total), "Booking Success", JOptionPane.INFORMATION_MESSAGE);
+
+
+        JPanel confirmationPanel = new JPanel(new GridLayout(10, 2));
+        confirmationPanel.setBackground(Color.WHITE);
+
+        Font font = new Font("Segoe UI", Font.BOLD, 14);
+
+        JLabel fullNameLabel = new JLabel("Full Name:");
+        fullNameLabel.setFont(font);
+        confirmationPanel.add(fullNameLabel);
+        JLabel fullNameValue = new JLabel(fullName);
+        fullNameValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(fullNameValue);
+
+        JLabel numPeopleLabel = new JLabel("Number of People:");
+        numPeopleLabel.setFont(font);
+        confirmationPanel.add(numPeopleLabel);
+        JLabel numPeopleValue = new JLabel(numPeopleText);
+        numPeopleValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(numPeopleValue);
+
+        JLabel checkInLabel = new JLabel("Check-in Date:");
+        checkInLabel.setFont(font);
+        confirmationPanel.add(checkInLabel);
+        JLabel checkInValue = new JLabel(checkInDate);
+        checkInValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(checkInValue);
+
+        JLabel checkOutLabel = new JLabel("Check-out Date:");
+        checkOutLabel.setFont(font);
+        confirmationPanel.add(checkOutLabel);
+        JLabel checkOutValue = new JLabel(checkOutDate);
+        checkOutValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(checkOutValue);
+
+        JLabel roomLabel = new JLabel("Room:");
+        roomLabel.setFont(font);
+        confirmationPanel.add(roomLabel);
+        JLabel roomValue = new JLabel((String) roomDropdown.getSelectedItem());
+        roomValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(roomValue);
+
+        JLabel poolLabel = new JLabel("Pool:");
+        poolLabel.setFont(font);
+        confirmationPanel.add(poolLabel);
+        JLabel poolValue = new JLabel((String) poolDropdown.getSelectedItem());
+        poolValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(poolValue);
+
+        JLabel activityLabel = new JLabel("Activity:");
+        activityLabel.setFont(font);
+        confirmationPanel.add(activityLabel);
+        JLabel activityValue = new JLabel((String) activitiesDropdown.getSelectedItem());
+        activityValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(activityValue);
+
+        JLabel parkingLabel = new JLabel("Parking:");
+        parkingLabel.setFont(font);
+        confirmationPanel.add(parkingLabel);
+        JLabel parkingValue = new JLabel(parkingCheckbox.isSelected() ? "Yes" : "No");
+        parkingValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(parkingValue);
+
+        JLabel cottageLabel = new JLabel("Cottage:");
+        cottageLabel.setFont(font);
+        confirmationPanel.add(cottageLabel);
+        JLabel cottageValue = new JLabel(cottageCheckbox.isSelected() ? "Yes" : "No");
+        cottageValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        confirmationPanel.add(cottageValue);
+
+        JLabel totalLabelDisplay = new JLabel("Total:");
+        totalLabelDisplay.setFont(font);
+        confirmationPanel.add(totalLabelDisplay);
+        JLabel totalValue = new JLabel(totalLabel.getText()); // Use the existing totalLabel text
+        totalValue.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        confirmationPanel.add(totalValue);
+
+        int confirmResult = JOptionPane.showConfirmDialog(this, confirmationPanel, "Confirm Booking", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        
+        if (confirmResult == JOptionPane.OK_OPTION){
         try {
             int numPeople = Integer.parseInt(numPeopleText);
             String room = (String) roomDropdown.getSelectedItem();
@@ -385,27 +528,11 @@ private void showReceiptFrame(String fullName, double total) {
             String activity = (String) activitiesDropdown.getSelectedItem();
             boolean parking = parkingCheckbox.isSelected();
             boolean cottage = cottageCheckbox.isSelected();
-            double total = Double.parseDouble(totalLabel.getText().replace("Total: ₱", ""));
-            
-            // Show confirmation message before booking
-            int confirmation = JOptionPane.showConfirmDialog(this, 
-                "Confirm your booking:\n" +
-                "Full Name: " + fullName + "\n" +
-                "Number of People: " + numPeople + "\n" +
-                "Room: " + room + "\n" +
-                "Pool: " + pool + "\n" +
-                "Activity: " + activity + "\n" +
-                "Parking: " + (parking ? "Yes" : "No") + "\n" +
-                "Cottage: " + (cottage ? "Yes" : "No") + "\n" +
-                "Check-in Date: " + checkInDate + "\n" +
-                "Check-out Date: " + checkOutDate + "\n" +
-                "Total: ₱" + total, 
-                "Booking Confirmation", 
-                JOptionPane.OK_CANCEL_OPTION);
 
-           // Save to database
-                Connection connection = DatabaseConnection.getConnection();
-                String sql = "INSERT INTO Billing (FullName, NumberOfPeople, Room, Pool, Activity, Parking, Cottage, CheckInDate, CheckOutDate, Total) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            // Save to database
+             Connection connection = DatabaseConnection.getConnection();
+                String sql = "INSERT INTO Billing (FullName, NumberOfPeople, Room, Pool, Activity, Parking, Cottage, Total, CheckInDate, CheckOutDate) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setString(1, fullName);
                 preparedStatement.setInt(2, numPeople);
@@ -414,16 +541,16 @@ private void showReceiptFrame(String fullName, double total) {
                 preparedStatement.setString(5, activity);
                 preparedStatement.setBoolean(6, parking);
                 preparedStatement.setBoolean(7, cottage);
-                preparedStatement.setString(8, checkInDate);
-                preparedStatement.setString(9, checkOutDate);
-                preparedStatement.setDouble(10, total);
+                preparedStatement.setDouble(8, total);
+                preparedStatement.setString(9, checkInDate);
+                preparedStatement.setString(10, checkOutDate);
 
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted > 0) {
                 JOptionPane.showMessageDialog(this, "Booking successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
                 // Show receipt frame
-                showReceiptFrame(fullName, total);
+                showReceiptFrame(fullName, total, checkInDate, checkOutDate);
             }
 
             preparedStatement.close();
@@ -435,6 +562,50 @@ private void showReceiptFrame(String fullName, double total) {
         }
     }
     }//GEN-LAST:event_BookingsActionPerformed
+    }
+   private double getPriceFromDatabase(String selectedItem, String itemCategory) {
+    double price = 0.0;
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
+
+    try {
+        
+        connection = DatabaseConnection.getConnection();
+
+        // Prepare the query based on category and name
+        String query = "SELECT price FROM Prices WHERE category = ? AND name = ?";
+        preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, itemCategory);   // Set category (e.g., Room, Pool, Activity)
+        preparedStatement.setString(2, selectedItem);   // Set the specific item (e.g., Room name, Pool name, Activity name)
+
+        
+        resultSet = preparedStatement.executeQuery();
+
+        
+        if (resultSet.next()) {
+            price = resultSet.getDouble("price");
+        } else {
+            
+            System.out.println("No price found for " + itemCategory + ": " + selectedItem);
+        }
+    } catch (SQLException ex) {
+        
+        System.err.println("Error fetching price: " + ex.getMessage());
+        JOptionPane.showMessageDialog(null, "Error fetching price: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        
+        try {
+            if (resultSet != null) resultSet.close();
+            if (preparedStatement != null) preparedStatement.close();
+            if (connection != null) connection.close();
+        } catch (SQLException ex) {
+            System.err.println("Error closing database resources: " + ex.getMessage());
+        }
+    }
+
+    return price;
+}
 
     private void poolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_poolsActionPerformed
         Pool pool = new Pool();
@@ -507,4 +678,37 @@ private void showReceiptFrame(String fullName, double total) {
     private javax.swing.JButton res;
     private javax.swing.JButton room;
     // End of variables declaration//GEN-END:variables
+
+    private void addField(JFrame frame, String label, String text) {
+    JPanel panel = new JPanel();
+    panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    panel.setBackground(Color.WHITE);
+    JLabel fieldLabel = new JLabel(label);
+    fieldLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+    JTextField textField = new JTextField(text);
+    textField.setFont(new Font("Arial", Font.PLAIN, 12));
+    textField.setEditable(false);
+    textField.setPreferredSize(new Dimension(180, 25)); // Setting width
+    textField.setBackground(new Color(240, 240, 240)); // Light grey background for text field
+    
+    panel.add(fieldLabel);
+    panel.add(textField);
+    frame.add(panel);
+}
+
+
+    private void addField(JFrame frame, String label, JTextField textField) {
+    JPanel panel = new JPanel();
+    panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    panel.setBackground(Color.WHITE);
+    JLabel fieldLabel = new JLabel(label);
+    fieldLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+    textField.setFont(new Font("Arial", Font.PLAIN, 12));
+    textField.setPreferredSize(new Dimension(180, 25)); // Setting width
+    textField.setBackground(new Color(240, 240, 240)); // Light grey background for text field
+    
+    panel.add(fieldLabel);
+    panel.add(textField);
+    frame.add(panel);
+}
 }

@@ -4,6 +4,9 @@
  */
 package Main;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -181,7 +184,12 @@ public class Login extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
         
         // Redirect to Admin_page
-        Admin_page adminPage = new Admin_page(); // Create instance of Admin_page
+        Admin_page adminPage = null;
+       try {
+           adminPage = new Admin_page(); // Create instance of Admin_page
+       } catch (SQLException ex) {
+           Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+       }
         adminPage.setVisible(true); // Show Admin_page
         this.dispose(); // Close the current login frame
     } else {

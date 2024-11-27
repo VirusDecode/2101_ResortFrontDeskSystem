@@ -3,33 +3,36 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package Main;
+import Main.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableModel;
 public class Admin_page extends javax.swing.JFrame {
-    
+
     
 
     /**
      * Creates new form Admin_page
      */
-    public Admin_page() {
+    public Admin_page() throws SQLException {
         initComponents();
         loadBillingToTable();
     }
 // Set up the JTable with correct column headers
 private void setupTable() {
     DefaultTableModel model = new DefaultTableModel();
-    model.setColumnIdentifiers(new String[]{"Id", "Full Name", "Number of People", "Room", "Pool", "Activity", "Parking", "Cottage", "Check-in Date", "Check-out Date", "Total"});
+    model.setColumnIdentifiers(new String[]{"Id", "Full Name", "Number of People", "Room", "Pool", "Activity", "Parking", "Cottage", "Total"});
     jTable1.setModel(model);
 }
 
 // Load data from the Billing table into the JTable
-private void loadBillingToTable() {
+private void loadBillingToTable() throws SQLException {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     model.setRowCount(0); // Clear existing data in the table
 
@@ -37,6 +40,7 @@ private void loadBillingToTable() {
         Connection connection = DatabaseConnection.getConnection();
         String sql = "SELECT * FROM Billing";
         PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
@@ -48,33 +52,38 @@ private void loadBillingToTable() {
             String activity = resultSet.getString("Activity");
             boolean parking = resultSet.getBoolean("Parking");
             boolean cottage = resultSet.getBoolean("Cottage");
-            String checkInDate = resultSet.getString("CheckInDate"); 
-            String checkOutDate = resultSet.getString("CheckOutDate"); 
             double total = resultSet.getDouble("Total");
+            String checkInDate = resultSet.getString("CheckInDate");
+            String checkOutDate = resultSet.getString("CheckOutDate");
 
+
+            // Add a row to the table model
             model.addRow(new Object[]{
-                id,
-                fullName,
-                numberOfPeople,
-                room,
-                pool,
-                activity,
-                parking ? "Yes" : "No",
-                cottage ? "Yes" : "No",
-                checkInDate,
-                checkOutDate,
-                total
-            });
-        }
+                    id,
+                    fullName,
+                    numberOfPeople,
+                    room,
+                    pool,
+                    activity,
+                    parking ? "Yes" : "No",
+                    cottage ? "Yes" : "No",
+                    total,
+                    checkInDate,
+                    checkOutDate
+                });
+            }
+
 
         resultSet.close();
-        preparedStatement.close();
-        connection.close();
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error loading billing data:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error loading billing data:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
-}
-
+public void refreshBookings() throws SQLException {
+        loadBillingToTable();
+    }
 
 // Call setupTable() once during initialization to set up the JTable
 // Call loadBillingToTable() whenever you want to refresh the data
@@ -132,7 +141,7 @@ private void loadBillingToTable() {
                 {null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Full Name", "No. of people", "Rooms", "Acts", "Pool", "Cottage", "Parking Fee", "Check In", "Check Out", "Total"
+                "ID", "Full Name", "No. of people", "Rooms", "Acts", "Pool", "Cottage", "Parking Fee", "Total", "Check In Date", "Check Out Date"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -147,10 +156,6 @@ private void loadBillingToTable() {
             }
         });
 
-        jButton1.setBackground(new java.awt.Color(0, 255, 204));
-        jButton1.setFont(new java.awt.Font("Segoe UI Black", 0, 12)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(8, 8, 8));
-        jButton1.setText("See Overview");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -163,31 +168,33 @@ private void loadBillingToTable() {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
-            .addComponent(jScrollPane1)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 441, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(16, 16, 16))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(27, Short.MAX_VALUE))))
         );
-
-        jButton1.getAccessibleContext().setAccessibleName("See Overview");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -211,9 +218,9 @@ private void loadBillingToTable() {
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
         Overview overviewFrame = new Overview();
-        overviewFrame. setVisible(true);
+        overviewFrame.setVisible(true);
+        // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -246,7 +253,11 @@ private void loadBillingToTable() {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Admin_page().setVisible(true);
+                try {
+                    new Admin_page().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(Admin_page.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
