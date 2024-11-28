@@ -1,0 +1,7 @@
+Name: kete
+Contact: 11
+Birthdate: 122 
+Check-in Date: 2024-10-12
+Check-out Date: 2024-10-13
+Payment Method: Cash
+Total: ₱1000.00
