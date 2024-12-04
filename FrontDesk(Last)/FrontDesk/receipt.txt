@@ -1,0 +1,5 @@
+Name: asd
+Contact: dad
+Birthdate: adas
+Payment Method: Cash
+Total: ₱1600.00
