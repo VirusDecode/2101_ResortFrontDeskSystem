@@ -9,10 +9,15 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
+import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableModel;
 
 public class Room extends javax.swing.JFrame {
+
+    public static List<String> getAvailableRooms() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
     /**
      * Creates new form Admin_page
@@ -34,7 +39,7 @@ private void loadRoomsToTable() {
         connection = DatabaseConnection.getConnection();
 
         // Prepare SQL query to fetch data from Rooms table
-        String sql = "SELECT Id, Room, Status FROM Rooms";
+        String sql = "SELECT Id, Room, Status, PricePerNight, Pax FROM Rooms";
         preparedStatement = connection.prepareStatement(sql);
 
         // Execute the query
@@ -45,9 +50,10 @@ private void loadRoomsToTable() {
             int id = resultSet.getInt("Id");
             String room = resultSet.getString("Room");
             String status = resultSet.getString("Status");
-
+            double pricePerNight = resultSet.getDouble("PricePerNight");
+            int pax = resultSet.getInt("Pax");
             // Add the data as a row in the table model
-            model.addRow(new Object[]{id, room, status});
+           model.addRow(new Object[]{id, room, status, pricePerNight, pax});
         }
     } catch (SQLException e) {
         e.printStackTrace();
@@ -126,13 +132,13 @@ private void loadRoomsToTable() {
         jTable1.setBackground(new java.awt.Color(255, 255, 204));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Room", "Status"
+                "ID", "Room", "Status", "PricePerNight", "Pax"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -180,8 +186,6 @@ private void loadRoomsToTable() {
             }
         });
         jPanel1.add(delete, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 440, 133, 48));
-
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\garci\\Downloads\\8n89_l7pb_210318 (1).jpg")); // NOI18N
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 950, 540));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -269,51 +273,80 @@ private void loadRoomsToTable() {
 
     private void AddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddActionPerformed
  // Show input dialog to get room name
-    String roomName = JOptionPane.showInputDialog(this, "Enter Room Name:", "Add Room", JOptionPane.PLAIN_MESSAGE);
+     String roomName = JOptionPane.showInputDialog(this, "Enter Room Name:", "Add Room", JOptionPane.PLAIN_MESSAGE);
+    if (roomName == null || roomName.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Room name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-    // Check if input is valid
-    if (roomName != null && !roomName.trim().isEmpty()) {
-        // Default status for the new room
-        String status = "Available";
+    String pricePerNightStr = JOptionPane.showInputDialog(this, "Enter Price Per Night:", "Add Room", JOptionPane.PLAIN_MESSAGE);
+    if (pricePerNightStr == null || pricePerNightStr.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Price per night cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    double pricePerNight;
+    try {
+        pricePerNight = Double.parseDouble(pricePerNightStr);
+        if (pricePerNight <= 0) throw new NumberFormatException();
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid price per night. Enter a positive number.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-        // Insert into database
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-        try {
-            // Get database connection
-            connection = DatabaseConnection.getConnection();
+    String paxStr = JOptionPane.showInputDialog(this, "Enter Maximum Occupancy (Pax):", "Add Room", JOptionPane.PLAIN_MESSAGE);
+    if (paxStr == null || paxStr.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Maximum occupancy cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    int pax;
+    try {
+        pax = Integer.parseInt(paxStr);
+        if (pax <= 0) throw new NumberFormatException();
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid occupancy. Enter a positive integer.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-            // Prepare SQL insert query
-            String sql = "INSERT INTO Rooms (Room, Status) VALUES (?, ?)";
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, roomName);
-            preparedStatement.setString(2, status);
+    // Default status for the new room
+    String status = "Available";
 
-            // Execute the query
-            int rowsInserted = preparedStatement.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(this, "Room added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadRoomsToTable();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to add room.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            // Close resources
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                DatabaseConnection.closeConnection(connection);
+    // Insert into database
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    try {
+        // Get database connection
+        connection = DatabaseConnection.getConnection();
+
+        // Prepare SQL insert query
+        String sql = "INSERT INTO Rooms (Room, Status, PricePerNight, Pax) VALUES (?, ?, ?, ?)";
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, roomName);
+        preparedStatement.setString(2, status);
+        preparedStatement.setDouble(3, pricePerNight);
+        preparedStatement.setInt(4, pax);
+
+        // Execute the query
+        int rowsInserted = preparedStatement.executeUpdate();
+        if (rowsInserted > 0) {
+            JOptionPane.showMessageDialog(this, "Room added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadRoomsToTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to add room.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        // Close resources
+        if (preparedStatement != null) {
+            try {
+                preparedStatement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Room name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        if (connection != null) {
+            DatabaseConnection.closeConnection(connection);
+        }
     }
     }//GEN-LAST:event_AddActionPerformed
 

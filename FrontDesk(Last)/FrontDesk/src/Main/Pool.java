@@ -110,13 +110,13 @@ private void loadPoolToTable() {
         jTable1.setBackground(new java.awt.Color(255, 255, 204));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Pool", "Status"
+                "ID", "Pool", "Status", "PricePerNight", "Pax"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -164,8 +164,6 @@ private void loadPoolToTable() {
             }
         });
         jPanel1.add(delete, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 440, 133, 48));
-
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\garci\\Downloads\\8n89_l7pb_210318 (1).jpg")); // NOI18N
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 950, 540));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -233,40 +231,8 @@ private void loadPoolToTable() {
     }//GEN-LAST:event_deleteActionPerformed
 
     private void AddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddActionPerformed
-// Prompt user for pool name
-    String poolName = JOptionPane.showInputDialog(this, "Enter Pool Name:", "Add Pool", JOptionPane.PLAIN_MESSAGE);
 
-    // Check if input is valid
-    if (poolName != null && !poolName.trim().isEmpty()) {
-        // Default status for the new pool
-        String status = "Available";
-
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-
-        try {
-            connection = DatabaseConnection.getConnection();
-            String sql = "INSERT INTO Pool (Pool, Status) VALUES (?, ?)";
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, poolName);
-            preparedStatement.setString(2, status);
-
-            int rowsInserted = preparedStatement.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(this, "Pool added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-                // Refresh the table to show the new pool
-                loadPoolToTable();
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
-            if (connection != null) DatabaseConnection.closeConnection(connection);
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Pool name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
-    }
+   
     }//GEN-LAST:event_AddActionPerformed
 
     private void editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editActionPerformed

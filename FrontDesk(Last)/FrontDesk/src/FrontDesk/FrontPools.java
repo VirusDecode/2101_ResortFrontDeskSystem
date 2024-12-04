@@ -177,13 +177,13 @@ private double getPriceFromDatabase(String name, String category) {
         jTable1.setBackground(new java.awt.Color(204, 255, 255));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Pool", "Status"
+                "ID", "Pool", "Status", "", "Title 5"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -202,7 +202,6 @@ private double getPriceFromDatabase(String name, String category) {
         });
         jPanel1.add(jButton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 490, 101, 35));
 
-        Bookings.setIcon(new javax.swing.ImageIcon("C:\\Users\\garci\\Downloads\\bill (2).png")); // NOI18N
         Bookings.setText("BILLING");
         Bookings.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 5, true));
         Bookings.addActionListener(new java.awt.event.ActionListener() {
@@ -236,7 +235,6 @@ private double getPriceFromDatabase(String name, String category) {
         });
         jPanel1.add(btnsearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 150, 70, -1));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\garci\\Downloads\\poools (1).jpg")); // NOI18N
         jLabel2.setText("jLabel2");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 1000, 490));
 
