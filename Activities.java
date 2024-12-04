@@ -21,7 +21,7 @@ public class Activities extends javax.swing.JFrame {
         loadActsToTable();
     }
 private void loadActsToTable() {
-    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+  DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     model.setRowCount(0); // Clear existing rows
 
     Connection connection = null;
@@ -30,17 +30,19 @@ private void loadActsToTable() {
 
     try {
         connection = DatabaseConnection.getConnection();
-        String sql = "SELECT Id, Activities, Status FROM Activities";
+        String sql = "SELECT Id, Activities, Status, PricePerActivity, MaxParticipants FROM Activities";
         preparedStatement = connection.prepareStatement(sql);
         resultSet = preparedStatement.executeQuery();
 
         // Loop through resultSet and populate the table model
         while (resultSet.next()) {
-            int id = resultSet.getInt("Id");
+             int id = resultSet.getInt("Id");
             String activity = resultSet.getString("Activities");
             String status = resultSet.getString("Status");
+            double pricePerActivity = resultSet.getDouble("PricePerActivity"); // Retrieve PricePerActivity
+            int maxParticipants = resultSet.getInt("MaxParticipants"); // Retrieve MaxParticipants
 
-            model.addRow(new Object[]{id, activity, status});
+             model.addRow(new Object[]{id, activity, status, pricePerActivity, maxParticipants});
         }
     } catch (SQLException e) {
         e.printStackTrace();
@@ -51,6 +53,7 @@ private void loadActsToTable() {
         if (connection != null) DatabaseConnection.closeConnection(connection);
     }
 }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -70,25 +73,27 @@ private void loadActsToTable() {
         Add = new javax.swing.JButton();
         edit = new javax.swing.JButton();
         delete = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(0, 153, 153));
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel2.setBackground(new java.awt.Color(204, 204, 255));
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 153, 51));
-        jLabel1.setText("RESORT FRONT DESK SYSTEM");
+        jLabel1.setText("ACTIVITY FIELD");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(264, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(297, 297, 297)
                 .addComponent(jLabel1)
-                .addGap(174, 174, 174))
+                .addContainerGap(303, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -98,93 +103,71 @@ private void loadActsToTable() {
                 .addContainerGap())
         );
 
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, -1));
+
+        jTable1.setBackground(new java.awt.Color(153, 255, 204));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Activities", "Status"
+                "ID", "Activities", "Status", "PricePerActivity", "MaxParticipants"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
 
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 495, 371));
+
         jButton7.setBackground(new java.awt.Color(102, 0, 0));
         jButton7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jButton7.setForeground(new java.awt.Color(0, 204, 204));
+        jButton7.setForeground(new java.awt.Color(255, 255, 255));
         jButton7.setText("Back");
+        jButton7.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 5, true));
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
             }
         });
+        jPanel1.add(jButton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 530, 101, 35));
 
         Add.setBackground(new java.awt.Color(204, 255, 204));
         Add.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         Add.setText("ADD");
+        Add.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 3, true));
         Add.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 AddActionPerformed(evt);
             }
         });
+        jPanel1.add(Add, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 450, 133, 48));
 
         edit.setBackground(new java.awt.Color(204, 204, 255));
         edit.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         edit.setText("UPDATE");
+        edit.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 3, true));
         edit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editActionPerformed(evt);
             }
         });
+        jPanel1.add(edit, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 450, 133, 48));
 
         delete.setBackground(new java.awt.Color(255, 204, 204));
         delete.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         delete.setText("DELETE");
+        delete.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 3, true));
         delete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteActionPerformed(evt);
             }
         });
+        jPanel1.add(delete, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 450, 133, 48));
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(Add, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(6, 6, 6))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(Add, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(57, 57, 57)
-                        .addComponent(edit, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(67, 67, 67)
-                        .addComponent(delete, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(16, 16, 16))
-        );
+        jLabel3.setIcon(new javax.swing.ImageIcon("C:\\Users\\Administrator\\Downloads\\31725 (1).jpg")); // NOI18N
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 950, 540));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -202,8 +185,8 @@ private void loadActsToTable() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        Main main = new Main();
-        main.setVisible(true);
+        Menu menu = new Menu();
+        menu.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton7ActionPerformed
 
@@ -306,40 +289,82 @@ private void loadActsToTable() {
     }//GEN-LAST:event_editActionPerformed
 
     private void AddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddActionPerformed
- // Prompt user for activity name
+  // Prompt user for activity name
     String activityName = JOptionPane.showInputDialog(this, "Enter Activity Name:", "Add Activity", JOptionPane.PLAIN_MESSAGE);
 
-    // Check if input is valid
-    if (activityName != null && !activityName.trim().isEmpty()) {
-        // Default status for the new activity
-        String status = "Active";
+// Check if input is valid
+if (activityName != null && !activityName.trim().isEmpty()) {
+    // Input for Price Per Activity
+    String pricePerActivityStr = JOptionPane.showInputDialog(this, "Enter Price Per Activity:", "Add Activity", JOptionPane.PLAIN_MESSAGE);
+    double pricePerActivity = 0.0;
 
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-
-        try {
-            connection = DatabaseConnection.getConnection();
-            String sql = "INSERT INTO Activities (Activities, Status) VALUES (?, ?)";
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, activityName);
-            preparedStatement.setString(2, status);
-
-            int rowsInserted = preparedStatement.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(this, "Activity added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                
-                // Refresh the table
-                loadActsToTable();
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            if (preparedStatement != null) try { preparedStatement.close(); } catch (SQLException e) { e.printStackTrace(); }
-            if (connection != null) DatabaseConnection.closeConnection(connection);
-        }
-    } else {
-        JOptionPane.showMessageDialog(this, "Activity name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+    // Validate Price Per Activity
+    try {
+        pricePerActivity = Double.parseDouble(pricePerActivityStr);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid Price Per Activity value!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;  // Exit if validation fails
     }
+
+    // Input for Max Participants (PAX)
+    String maxParticipantsStr = JOptionPane.showInputDialog(this, "Enter Maximum Number of Participants (PAX):", "Add Activity", JOptionPane.PLAIN_MESSAGE);
+    int maxParticipants = 0;
+
+    // Validate Max Participants
+    try {
+        maxParticipants = Integer.parseInt(maxParticipantsStr);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Invalid Maximum Participants value!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+        return;  // Exit if validation fails
+    }
+
+    // Default status for the new activity
+    String status = "Active";
+
+    // Insert into database
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    try {
+        // Get database connection
+        connection = DatabaseConnection.getConnection();
+
+        // Prepare SQL insert query with PricePerActivity and MaxParticipants
+        String sql = "INSERT INTO Activities (Activities, Status, PricePerActivity, MaxParticipants) VALUES (?, ?, ?, ?)";
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, activityName);
+        preparedStatement.setString(2, status);
+        preparedStatement.setDouble(3, pricePerActivity);  // Set Price Per Activity
+        preparedStatement.setInt(4, maxParticipants);     // Set Max Participants (PAX)
+
+        // Execute the query
+        int rowsInserted = preparedStatement.executeUpdate();
+        if (rowsInserted > 0) {
+            JOptionPane.showMessageDialog(this, "Activity added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            
+            // Refresh the table
+            loadActsToTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "Failed to add activity.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error connecting to database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        // Close resources
+        if (preparedStatement != null) {
+            try {
+                preparedStatement.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        if (connection != null) {
+            DatabaseConnection.closeConnection(connection);
+        }
+    }
+} else {
+    JOptionPane.showMessageDialog(this, "Activity name cannot be empty!", "Validation Error", JOptionPane.WARNING_MESSAGE);
+}
+
     }//GEN-LAST:event_AddActionPerformed
 
     /**
@@ -386,6 +411,7 @@ private void loadActsToTable() {
     private javax.swing.JButton edit;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;

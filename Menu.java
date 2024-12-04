@@ -4,11 +4,6 @@
  */
 package Main;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
@@ -18,12 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableModel;
 public class Menu extends javax.swing.JFrame {
@@ -34,29 +23,6 @@ public class Menu extends javax.swing.JFrame {
     public Menu() {
         initComponents();
     }
-private void loadPricesToDropdown(String category, JComboBox<String> dropdown) {
-    dropdown.removeAllItems();
-    dropdown.addItem("Please choose");
-    dropdown.addItem("NONE");
-    try {
-        Connection connection = DatabaseConnection.getConnection();
-        String sql = "SELECT Name FROM Prices WHERE Category = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setString(1, category);
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-        while (resultSet.next()) {
-            dropdown.addItem(resultSet.getString("Name"));
-        }
-
-        resultSet.close();
-        preparedStatement.close();
-        connection.close();
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error loading " + category + " data:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-    }
-}
-
 
 
     /**
@@ -71,75 +37,97 @@ private void loadPricesToDropdown(String category, JComboBox<String> dropdown) {
         jPanel1 = new javax.swing.JPanel();
         room = new javax.swing.JButton();
         res = new javax.swing.JButton();
-        Bookings = new javax.swing.JButton();
+        Bookingssdad = new javax.swing.JButton();
         pools = new javax.swing.JButton();
         list = new javax.swing.JButton();
         acts = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(102, 255, 204));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        room.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         room.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/door-lock.png"))); // NOI18N
-        room.setText("ROOMS");
+        room.setText("  ROOMS");
+        room.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
         room.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 roomActionPerformed(evt);
             }
         });
+        jPanel1.add(room, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 110, 177, 90));
 
+        res.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         res.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/restaurant-building.png"))); // NOI18N
-        res.setText("RESTAURANTS");
+        res.setText("  RESTAURANT");
+        res.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
         res.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 resActionPerformed(evt);
             }
         });
+        jPanel1.add(res, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 240, 180, 90));
 
-        Bookings.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/payment-method.png"))); // NOI18N
-        Bookings.setText("BILLING");
-        Bookings.addActionListener(new java.awt.event.ActionListener() {
+        Bookingssdad.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        Bookingssdad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/admin.png"))); // NOI18N
+        Bookingssdad.setText("   ADMIN");
+        Bookingssdad.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
+        Bookingssdad.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BookingsActionPerformed(evt);
+                BookingssdadActionPerformed(evt);
             }
         });
+        jPanel1.add(Bookingssdad, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 380, 180, 95));
 
+        pools.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         pools.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/swimming-pool.png"))); // NOI18N
-        pools.setText("POOL'S");
+        pools.setText("   POOL'S");
+        pools.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
         pools.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 poolsActionPerformed(evt);
             }
         });
+        jPanel1.add(pools, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 110, 180, 90));
 
+        list.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         list.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/invoice.png"))); // NOI18N
-        list.setText("LIST OF PRICE");
+        list.setText(" LIST OF PRICE");
+        list.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
         list.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 listActionPerformed(evt);
             }
         });
+        jPanel1.add(list, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, 180, 95));
 
+        acts.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         acts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Main/icons/team-building.png"))); // NOI18N
-        acts.setText("ACTIVITIES");
+        acts.setText("  ACTIVITIES");
+        acts.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
         acts.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actsActionPerformed(evt);
             }
         });
+        jPanel1.add(acts, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 240, 180, 90));
 
         jButton7.setBackground(new java.awt.Color(102, 0, 0));
         jButton7.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jButton7.setForeground(new java.awt.Color(102, 255, 153));
+        jButton7.setForeground(new java.awt.Color(255, 255, 255));
         jButton7.setText("Back");
+        jButton7.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 5, true));
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
             }
         });
+        jPanel1.add(jButton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(703, 473, 110, 50));
 
         jPanel2.setBackground(new java.awt.Color(0, 153, 153));
 
@@ -164,48 +152,10 @@ private void loadPricesToDropdown(String category, JComboBox<String> dropdown) {
                 .addContainerGap())
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(47, 47, 47)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(room, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(res, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(pools, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(list, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(113, 113, 113)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(acts, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(Bookings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(84, 84, 84))
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(20, 20, 20))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(68, 68, 68)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(room, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pools, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(acts, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(79, 79, 79)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(res, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(list, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Bookings, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
-                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
-        );
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 840, -1));
+
+        jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\Administrator\\Downloads\\31652 (1).jpg")); // NOI18N
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 840, 490));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -234,378 +184,13 @@ private void loadPricesToDropdown(String category, JComboBox<String> dropdown) {
         this.dispose();
     }//GEN-LAST:event_resActionPerformed
 // Receipt Frame
-private void showReceiptFrame(String fullName, double total, String checkInDate, String checkOutDate) {
-    JFrame receiptFrame = new JFrame("Receipt");
-   receiptFrame.setSize(300, 400);  // Smaller window size
-    receiptFrame.setLocationRelativeTo(null);  // Center the frame
-    receiptFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+    private void BookingssdadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BookingssdadActionPerformed
+         Admin_page admin_page = new Admin_page();
+        admin_page.setVisible(true);
+        this.dispose();
     
-     receiptFrame.getContentPane().setBackground(new Color(255, 255, 255));
-    
-    // Use a layout manager with padding and spacing
-    receiptFrame.setLayout(new BoxLayout(receiptFrame.getContentPane(), BoxLayout.Y_AXIS));
-    
-    JLabel titleLabel = new JLabel("Booking Receipt");
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
-    titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-    titleLabel.setForeground(new Color(51, 51, 255)); // Dark Blue Color
-    receiptFrame.add(titleLabel);
-    receiptFrame.add(Box.createVerticalStrut(10));  // Adds some space below the title
-    
-    addField(receiptFrame, "Name:", fullName);
-    addField(receiptFrame, "Check-in Date:", checkInDate);
-    addField(receiptFrame, "Check-out Date:", checkOutDate);
-    addField(receiptFrame, "Total:", "₱" + String.format("%.2f", total));
-
-    JTextField contactField = new JTextField();
-    JTextField birthdateField = new JTextField();
-    JComboBox<String> paymentDropdown = new JComboBox<>(new String[]{"Cash", "Credit Card", "GCash"});
-
-    addField(receiptFrame, "Contact:", contactField);
-    addField(receiptFrame, "Birthdate:", birthdateField);
-    
-    JPanel paymentPanel = new JPanel();
-    paymentPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-    paymentPanel.setBackground(Color.WHITE);
-    paymentPanel.add(new JLabel("Payment Method:"));
-    paymentDropdown.setFont(new Font("Arial", Font.PLAIN, 12));
-    paymentPanel.add(paymentDropdown);
-    receiptFrame.add(paymentPanel);
-    
-    addField(receiptFrame, "Total:", "₱" + String.format("%.2f", total));
-    
-    JButton saveButton = new JButton("Save Receipt");
-    saveButton.setFont(new Font("Arial", Font.BOLD, 14));
-    saveButton.setBackground(new Color(51, 102, 255)); // Blue Color for the button
-    saveButton.setForeground(Color.WHITE);
-    saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-    saveButton.addActionListener(e -> {
-        try {
-            String contact = contactField.getText();
-            String birthdate = birthdateField.getText();
-            String paymentMethod = (String) paymentDropdown.getSelectedItem();
-
-            if (contact.isEmpty() || birthdate.isEmpty()) {
-                JOptionPane.showMessageDialog(receiptFrame, "Please fill all fields!", "Validation Error", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            String receiptContent = "Name: " + fullName +
-                    "\nContact: " + contact +
-                    "\nBirthdate: " + birthdate +
-                    "\nCheck-in Date: " + checkInDate +  // Add Check-in date to the receipt
-                    "\nCheck-out Date: " + checkOutDate +  // Add Check-out date to the receipt
-                    "\nPayment Method: " + paymentMethod +
-                    "\nTotal: ₱" + String.format("%.2f", total);
-
-            try (PrintWriter writer = new PrintWriter("receipt.txt")) {
-                writer.println(receiptContent);
-            }
-
-            JOptionPane.showMessageDialog(receiptFrame, "Receipt saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            receiptFrame.dispose();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(receiptFrame, "Error saving receipt:\n" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    });
-
-    receiptFrame.add(Box.createVerticalStrut(10));
-    receiptFrame.add(saveButton);
-
-    
-    receiptFrame.setVisible(true);
-}
-    private void BookingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BookingsActionPerformed
-    JTextField fullNameField = new JTextField();
-    JTextField numPeopleField = new JTextField();
-    JComboBox<String> roomDropdown = new JComboBox<>();
-    JComboBox<String> poolDropdown = new JComboBox<>();
-    JComboBox<String> activitiesDropdown = new JComboBox<>();
-    JCheckBox parkingCheckbox = new JCheckBox("Parking (₱100)");
-    JCheckBox cottageCheckbox = new JCheckBox("Cottage (₱350)");
-    JLabel totalLabel = new JLabel("Total: ₱0.00");
-    
-    JTextField checkInField = new JTextField();
-    JTextField checkOutField = new JTextField();
-
-    
-    loadPricesToDropdown("Room", roomDropdown);
-    loadPricesToDropdown("Pool", poolDropdown);
-    loadPricesToDropdown("Activities", activitiesDropdown);
-
-    
-    JPanel panel = new JPanel(new GridLayout(10, 3));
-    panel.add(new JLabel("Full Name:"));
-    panel.add(fullNameField);
-    panel.add(new JLabel("Number of People:"));
-    panel.add(numPeopleField);
-    panel.add(new JLabel("Check-in Date (YYYY-MM-DD):"));
-    panel.add(checkInField);
-    panel.add(new JLabel("Check-out Date (YYYY-MM-DD):"));
-    panel.add(checkOutField);
-    panel.add(new JLabel("Select Room:"));
-    panel.add(roomDropdown);
-    panel.add(new JLabel("Select Pool:"));
-    panel.add(poolDropdown);
-    panel.add(new JLabel("Select Activity:"));
-    panel.add(activitiesDropdown);
-    panel.add(parkingCheckbox);
-    panel.add(cottageCheckbox);
-    panel.add(totalLabel);
-
-    
-    ActionListener updateTotalListener = e -> {
-        double total = 0.0;
-
-        String selectedRoom = (String) roomDropdown.getSelectedItem();
-        String selectedPool = (String) poolDropdown.getSelectedItem();
-        String selectedActivity = (String) activitiesDropdown.getSelectedItem();
-
-        if (selectedRoom != null) total += getPriceFromDatabase(selectedRoom, "Room");
-        if (selectedPool != null) total += getPriceFromDatabase(selectedPool, "Pool");
-        if (selectedActivity != null) total += getPriceFromDatabase(selectedActivity, "Activities");
-
-        if (parkingCheckbox.isSelected()) total += 100;
-        if (cottageCheckbox.isSelected()) total += 350;
-
-        totalLabel.setText("Total: ₱" + String.format("%.2f", total));
-    };
-
-    roomDropdown.addActionListener(updateTotalListener);
-    poolDropdown.addActionListener(updateTotalListener);
-    activitiesDropdown.addActionListener(updateTotalListener);
-    parkingCheckbox.addActionListener(updateTotalListener);
-    cottageCheckbox.addActionListener(updateTotalListener);
-
-    
-    int result = JOptionPane.showConfirmDialog(this, panel, "Book a Service", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-    if (result == JOptionPane.OK_OPTION) {
-        String fullName = fullNameField.getText();
-        String numPeopleText = numPeopleField.getText();
-        String checkInDate = checkInField.getText();
-        String checkOutDate = checkOutField.getText();
-
-
-        if (fullName.isEmpty() || numPeopleText.isEmpty() || checkInDate.isEmpty() || checkOutDate.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all required fields!", "Validation Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date checkIn = null;
-        Date checkOut = null;
-        try {
-            checkIn = dateFormat.parse(checkInDate);
-        } catch (ParseException ex) {
-            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
-        }
-       
-        try {
-            checkOut = dateFormat.parse(checkOutDate);
-        } catch (ParseException ex) {
-            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        long differenceInMillis = checkOut.getTime() - checkIn.getTime();
-        long numberOfNights = TimeUnit.DAYS.convert(differenceInMillis, TimeUnit.MILLISECONDS);
-
-        
-        double roomPrice = getPriceFromDatabase((String) roomDropdown.getSelectedItem(), "Room");
-
-        
-        if (roomPrice <= 0) {
-            JOptionPane.showMessageDialog(this, "Invalid room price!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        
-       double totalRoomCost = roomPrice * numberOfNights;
-
-        
-        double total = totalRoomCost;
-        String selectedPool = (String) poolDropdown.getSelectedItem();
-        String selectedActivity = (String) activitiesDropdown.getSelectedItem();
-
-        if (selectedPool != null) {
-            total += getPriceFromDatabase(selectedPool, "Pool");
-        }
-
-        if (selectedActivity != null) {
-            total += getPriceFromDatabase(selectedActivity, "Activity");
-        }
-        if (parkingCheckbox.isSelected()) total += 100;
-        if (cottageCheckbox.isSelected()) total += 350;
-
-        
-        totalLabel.setText("Total: ₱" + String.format("%.2f", total));
-
-        
-        JOptionPane.showMessageDialog(this, "Booking confirmed! Total amount: ₱" + String.format("%.2f", total), "Booking Success", JOptionPane.INFORMATION_MESSAGE);
-
-
-        JPanel confirmationPanel = new JPanel(new GridLayout(10, 2));
-        confirmationPanel.setBackground(Color.WHITE);
-
-        Font font = new Font("Segoe UI", Font.BOLD, 14);
-
-        JLabel fullNameLabel = new JLabel("Full Name:");
-        fullNameLabel.setFont(font);
-        confirmationPanel.add(fullNameLabel);
-        JLabel fullNameValue = new JLabel(fullName);
-        fullNameValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(fullNameValue);
-
-        JLabel numPeopleLabel = new JLabel("Number of People:");
-        numPeopleLabel.setFont(font);
-        confirmationPanel.add(numPeopleLabel);
-        JLabel numPeopleValue = new JLabel(numPeopleText);
-        numPeopleValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(numPeopleValue);
-
-        JLabel checkInLabel = new JLabel("Check-in Date:");
-        checkInLabel.setFont(font);
-        confirmationPanel.add(checkInLabel);
-        JLabel checkInValue = new JLabel(checkInDate);
-        checkInValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(checkInValue);
-
-        JLabel checkOutLabel = new JLabel("Check-out Date:");
-        checkOutLabel.setFont(font);
-        confirmationPanel.add(checkOutLabel);
-        JLabel checkOutValue = new JLabel(checkOutDate);
-        checkOutValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(checkOutValue);
-
-        JLabel roomLabel = new JLabel("Room:");
-        roomLabel.setFont(font);
-        confirmationPanel.add(roomLabel);
-        JLabel roomValue = new JLabel((String) roomDropdown.getSelectedItem());
-        roomValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(roomValue);
-
-        JLabel poolLabel = new JLabel("Pool:");
-        poolLabel.setFont(font);
-        confirmationPanel.add(poolLabel);
-        JLabel poolValue = new JLabel((String) poolDropdown.getSelectedItem());
-        poolValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(poolValue);
-
-        JLabel activityLabel = new JLabel("Activity:");
-        activityLabel.setFont(font);
-        confirmationPanel.add(activityLabel);
-        JLabel activityValue = new JLabel((String) activitiesDropdown.getSelectedItem());
-        activityValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(activityValue);
-
-        JLabel parkingLabel = new JLabel("Parking:");
-        parkingLabel.setFont(font);
-        confirmationPanel.add(parkingLabel);
-        JLabel parkingValue = new JLabel(parkingCheckbox.isSelected() ? "Yes" : "No");
-        parkingValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(parkingValue);
-
-        JLabel cottageLabel = new JLabel("Cottage:");
-        cottageLabel.setFont(font);
-        confirmationPanel.add(cottageLabel);
-        JLabel cottageValue = new JLabel(cottageCheckbox.isSelected() ? "Yes" : "No");
-        cottageValue.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        confirmationPanel.add(cottageValue);
-
-        JLabel totalLabelDisplay = new JLabel("Total:");
-        totalLabelDisplay.setFont(font);
-        confirmationPanel.add(totalLabelDisplay);
-        JLabel totalValue = new JLabel(totalLabel.getText()); // Use the existing totalLabel text
-        totalValue.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        confirmationPanel.add(totalValue);
-
-        int confirmResult = JOptionPane.showConfirmDialog(this, confirmationPanel, "Confirm Booking", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        
-        if (confirmResult == JOptionPane.OK_OPTION){
-        try {
-            int numPeople = Integer.parseInt(numPeopleText);
-            String room = (String) roomDropdown.getSelectedItem();
-            String pool = (String) poolDropdown.getSelectedItem();
-            String activity = (String) activitiesDropdown.getSelectedItem();
-            boolean parking = parkingCheckbox.isSelected();
-            boolean cottage = cottageCheckbox.isSelected();
-
-            // Save to database
-             Connection connection = DatabaseConnection.getConnection();
-                String sql = "INSERT INTO Billing (FullName, NumberOfPeople, Room, Pool, Activity, Parking, Cottage, Total, CheckInDate, CheckOutDate) "
-                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setString(1, fullName);
-                preparedStatement.setInt(2, numPeople);
-                preparedStatement.setString(3, room);
-                preparedStatement.setString(4, pool);
-                preparedStatement.setString(5, activity);
-                preparedStatement.setBoolean(6, parking);
-                preparedStatement.setBoolean(7, cottage);
-                preparedStatement.setDouble(8, total);
-                preparedStatement.setString(9, checkInDate);
-                preparedStatement.setString(10, checkOutDate);
-
-            int rowsInserted = preparedStatement.executeUpdate();
-            if (rowsInserted > 0) {
-                JOptionPane.showMessageDialog(this, "Booking successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-                // Show receipt frame
-                showReceiptFrame(fullName, total, checkInDate, checkOutDate);
-            }
-
-            preparedStatement.close();
-            connection.close();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid number of people or price value!", "Validation Error", JOptionPane.WARNING_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error saving booking:\n" + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    }//GEN-LAST:event_BookingsActionPerformed
-    }
-   private double getPriceFromDatabase(String selectedItem, String itemCategory) {
-    double price = 0.0;
-    Connection connection = null;
-    PreparedStatement preparedStatement = null;
-    ResultSet resultSet = null;
-
-    try {
-        
-        connection = DatabaseConnection.getConnection();
-
-        // Prepare the query based on category and name
-        String query = "SELECT price FROM Prices WHERE category = ? AND name = ?";
-        preparedStatement = connection.prepareStatement(query);
-        preparedStatement.setString(1, itemCategory);   // Set category (e.g., Room, Pool, Activity)
-        preparedStatement.setString(2, selectedItem);   // Set the specific item (e.g., Room name, Pool name, Activity name)
-
-        
-        resultSet = preparedStatement.executeQuery();
-
-        
-        if (resultSet.next()) {
-            price = resultSet.getDouble("price");
-        } else {
-            
-            System.out.println("No price found for " + itemCategory + ": " + selectedItem);
-        }
-    } catch (SQLException ex) {
-        
-        System.err.println("Error fetching price: " + ex.getMessage());
-        JOptionPane.showMessageDialog(null, "Error fetching price: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        
-        try {
-            if (resultSet != null) resultSet.close();
-            if (preparedStatement != null) preparedStatement.close();
-            if (connection != null) connection.close();
-        } catch (SQLException ex) {
-            System.err.println("Error closing database resources: " + ex.getMessage());
-        }
-    }
-
-    return price;
-}
+    }//GEN-LAST:event_BookingssdadActionPerformed
 
     private void poolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_poolsActionPerformed
         Pool pool = new Pool();
@@ -667,10 +252,11 @@ private void showReceiptFrame(String fullName, double total, String checkInDate,
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Bookings;
+    private javax.swing.JButton Bookingssdad;
     private javax.swing.JButton acts;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton list;
@@ -678,37 +264,4 @@ private void showReceiptFrame(String fullName, double total, String checkInDate,
     private javax.swing.JButton res;
     private javax.swing.JButton room;
     // End of variables declaration//GEN-END:variables
-
-    private void addField(JFrame frame, String label, String text) {
-    JPanel panel = new JPanel();
-    panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-    panel.setBackground(Color.WHITE);
-    JLabel fieldLabel = new JLabel(label);
-    fieldLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-    JTextField textField = new JTextField(text);
-    textField.setFont(new Font("Arial", Font.PLAIN, 12));
-    textField.setEditable(false);
-    textField.setPreferredSize(new Dimension(180, 25)); // Setting width
-    textField.setBackground(new Color(240, 240, 240)); // Light grey background for text field
-    
-    panel.add(fieldLabel);
-    panel.add(textField);
-    frame.add(panel);
-}
-
-
-    private void addField(JFrame frame, String label, JTextField textField) {
-    JPanel panel = new JPanel();
-    panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-    panel.setBackground(Color.WHITE);
-    JLabel fieldLabel = new JLabel(label);
-    fieldLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-    textField.setFont(new Font("Arial", Font.PLAIN, 12));
-    textField.setPreferredSize(new Dimension(180, 25)); // Setting width
-    textField.setBackground(new Color(240, 240, 240)); // Light grey background for text field
-    
-    panel.add(fieldLabel);
-    panel.add(textField);
-    frame.add(panel);
-}
 }

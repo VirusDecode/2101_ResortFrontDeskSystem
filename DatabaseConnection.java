@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Main;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -34,7 +33,7 @@ public class DatabaseConnection {
         return connection;
     }
 
-    // Optional: method to close a connection
+    // Method to close a connection
     public static void closeConnection(Connection connection) {
         if (connection != null) {
             try {

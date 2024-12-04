@@ -3,24 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package Main;
-import Main.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import java.sql.ResultSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableModel;
 public class Admin_page extends javax.swing.JFrame {
 
-    
-
     /**
      * Creates new form Admin_page
      */
-    public Admin_page() throws SQLException {
+    public Admin_page() {
         initComponents();
         loadBillingToTable();
     }
@@ -32,7 +27,7 @@ private void setupTable() {
 }
 
 // Load data from the Billing table into the JTable
-private void loadBillingToTable() throws SQLException {
+private void loadBillingToTable() {
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     model.setRowCount(0); // Clear existing data in the table
 
@@ -53,37 +48,28 @@ private void loadBillingToTable() throws SQLException {
             boolean parking = resultSet.getBoolean("Parking");
             boolean cottage = resultSet.getBoolean("Cottage");
             double total = resultSet.getDouble("Total");
-            String checkInDate = resultSet.getString("CheckInDate");
-            String checkOutDate = resultSet.getString("CheckOutDate");
-
 
             // Add a row to the table model
             model.addRow(new Object[]{
-                    id,
-                    fullName,
-                    numberOfPeople,
-                    room,
-                    pool,
-                    activity,
-                    parking ? "Yes" : "No",
-                    cottage ? "Yes" : "No",
-                    total,
-                    checkInDate,
-                    checkOutDate
-                });
-            }
-
+                id, 
+                fullName, 
+                numberOfPeople, 
+                room, 
+                pool, 
+                activity, 
+                parking ? "Yes" : "No", 
+                cottage ? "Yes" : "No", 
+                total
+            });
+        }
 
         resultSet.close();
-            preparedStatement.close();
-            connection.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error loading billing data:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-        }
+        preparedStatement.close();
+        connection.close();
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error loading billing data:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
     }
-public void refreshBookings() throws SQLException {
-        loadBillingToTable();
-    }
+}
 
 // Call setupTable() once during initialization to set up the JTable
 // Call loadBillingToTable() whenever you want to refresh the data
@@ -104,7 +90,6 @@ public void refreshBookings() throws SQLException {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButton7 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -135,13 +120,13 @@ public void refreshBookings() throws SQLException {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Full Name", "No. of people", "Rooms", "Acts", "Pool", "Cottage", "Parking Fee", "Total", "Check In Date", "Check Out Date"
+                "ID", "Full Name", "No. of people", "Rooms", "Acts", "Pool", "Cottage", "Parking Fee", "Total"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -156,26 +141,17 @@ public void refreshBookings() throws SQLException {
             }
         });
 
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -185,15 +161,9 @@ public void refreshBookings() throws SQLException {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(16, 16, 16))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(27, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -212,16 +182,10 @@ public void refreshBookings() throws SQLException {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        Main main = new Main();
-        main.setVisible(true);
+        Menu menu = new Menu();
+        menu.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton7ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Overview overviewFrame = new Overview();
-        overviewFrame.setVisible(true);
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -253,17 +217,12 @@ public void refreshBookings() throws SQLException {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    new Admin_page().setVisible(true);
-                } catch (SQLException ex) {
-                    Logger.getLogger(Admin_page.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                new Admin_page().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
